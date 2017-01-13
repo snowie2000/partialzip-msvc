@@ -4,10 +4,13 @@
 #include <string.h>
 #include <inttypes.h>
 #include <zlib.h>
-#include <libgen.h>
+//#include <libgen.h>
 
 #include "common.h"
 #include "partial/partial.h"
+
+#pragma comment(lib, "zlibstat.lib")
+#pragma comment(lib, "libcurl_a.lib")
 
 static size_t dummyReceive(void* data, size_t size, size_t nmemb, void* info) {
 	return size * nmemb;
@@ -148,7 +151,7 @@ ZipInfo* PartialZipInit(const char* url)
 
 	if(info->centralDirectoryDesc)
 	{
-		info->centralDirectory = malloc(info->centralDirectoryDesc->CDSize);
+		info->centralDirectory = (char*)malloc(info->centralDirectoryDesc->CDSize);
 		start = info->centralDirectoryDesc->CDOffset;
 		end = start + info->centralDirectoryDesc->CDSize - 1;
 		sprintf(sRange, "%" PRIu64 "-%" PRIu64, start, end);
@@ -216,7 +219,7 @@ CDFile* PartialZipListFiles(ZipInfo* info)
 unsigned char* PartialZipCopyFileName(ZipInfo* info, CDFile* file)
 {
 	const unsigned char* curFileName = (const unsigned char*)file + sizeof(CDFile);
-	unsigned char* result = malloc(file->lenFileName + 1);
+	unsigned char* result = (unsigned char*)malloc(file->lenFileName + 1);
 	memcpy(result, curFileName, file->lenFileName);
 	result[file->lenFileName] = '\0';
 	return result;
@@ -492,7 +495,7 @@ bool PartialZipGetFiles(ZipInfo* info, CDFile* files[], size_t count, PartialZip
 	if (!count)
 		return true;
 
-	ReceiveBodyFileData *fileData = malloc(sizeof(ReceiveBodyFileData) * count);
+	ReceiveBodyFileData *fileData = (ReceiveBodyFileData *)malloc(sizeof(ReceiveBodyFileData) * count);
 	curl_easy_setopt(info->hCurl, CURLOPT_HTTPGET, 1);
 
 	// Apply Range string
@@ -505,7 +508,7 @@ bool PartialZipGetFiles(ZipInfo* info, CDFile* files[], size_t count, PartialZip
 		char temp[100];
 		rangeLength += sprintf(temp, "%" PRIu64 "%" PRIu64, start, end) + 2;
 	}
-	char range[rangeLength+1];
+	char *range = (char*)malloc((rangeLength+1)*sizeof(char));
 	char *rangeCurrent = range;
 	for (i = 0; i < count; i++) {
 		uint64_t start = files[i]->offset;
@@ -562,11 +565,16 @@ bool PartialZipGetFiles(ZipInfo* info, CDFile* files[], size_t count, PartialZip
 			// Multi-part failed, fallback to a single request per file
 			for (i = 0; i < count; i++)
 				if (!PartialZipGetFiles(info, &files[i], 1, callback, userInfo))
+				{
+					free(range);
 					return false;
+				}
+			free(range);
 			return true;
 		}
 	}
 
+	free(range);
 	return curl_result == 0;
 }
 

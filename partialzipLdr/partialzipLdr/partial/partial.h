@@ -2,6 +2,8 @@
 #include <curl/curl.h>
 #include <stdbool.h>
 
+#pragma pack(push, 1)
+
 typedef struct EndOfCD {
 	uint32_t signature;
 	uint16_t diskNo;
@@ -11,7 +13,7 @@ typedef struct EndOfCD {
 	uint32_t CDSize;
 	uint32_t CDOffset;
 	uint16_t lenComment;
-} __attribute__ ((packed)) EndOfCD;
+}  EndOfCD;
 
 typedef struct CDFile {
 	uint32_t signature;
@@ -31,7 +33,7 @@ typedef struct CDFile {
 	uint16_t internalAttr;
 	uint32_t externalAttr;
 	uint32_t offset;
-} __attribute__ ((packed)) CDFile;
+}  CDFile;
 
 typedef struct LocalFile {
 	uint32_t signature;
@@ -45,11 +47,12 @@ typedef struct LocalFile {
 	uint32_t size;
 	uint16_t lenFileName;
 	uint16_t lenExtra;
-} __attribute__ ((packed)) LocalFile;
+}  LocalFile;
+#pragma pack(pop)
 
 typedef struct ZipInfo ZipInfo;
 
-typedef size_t (*PartialZipGetFileCallback)(ZipInfo* info, CDFile* file, unsigned char *buffer, size_t size, void *userInfo);
+typedef size_t (WINAPI*PartialZipGetFileCallback)(ZipInfo* info, CDFile* file, unsigned char *buffer, size_t size, void *userInfo);
 
 struct ZipInfo {
 	char* url;
