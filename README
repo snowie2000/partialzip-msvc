@@ -1,7 +1,6 @@
-Use cmake 2.6 to create the Makefiles for this.
+Based on paritalzip from rpetrich (https://github.com/rpetrich/partialzip)
 
-Requires libcurl 7.19.4 for file:// URL support.
+Fully working with MSVC 2013
 
-test.c contains an example that is designed for a simple test.zip containing
-only a text.txt.
+zlib and curl required. (static library)
 
