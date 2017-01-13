@@ -5,11 +5,6 @@
 #pragma comment(lib, "comsuppw.lib")
 
 struct IPartialZipDownloader: public IUnknown{
-	virtual HRESULT STDMETHODCALLTYPE QueryInterface(
-		/* [in] */ REFIID riid,
-		/* [iid_is][out] */ __RPC__deref_out void __RPC_FAR *__RPC_FAR *ppvObject) = 0;
-	virtual ULONG STDMETHODCALLTYPE AddRef(void) = 0;
-	virtual ULONG STDMETHODCALLTYPE Release(void) = 0;
 	virtual BOOL WINAPI DownloadFileFromZip(char* szFileName, void* userInfo, PartialZipGetFileCallback fn) = 0;
 	virtual int WINAPI GetFileSize(char* szFileName) = 0;
 };
