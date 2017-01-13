@@ -1,6 +1,6 @@
 Based on paritalzip from rpetrich (https://github.com/rpetrich/partialzip)
 
-Fully working with MSVC 2013
+Fully compatible with MSVC 2013
 
 zlib and curl required. (static library)
 
